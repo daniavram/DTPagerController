@@ -63,6 +63,9 @@ open class DTPagerController: UIViewController, UIScrollViewDelegate {
         return viewControllers.count <= 1 ? 0 : perferredScrollIndicatorHeight
     }
     
+    /// Horizontal inset for segmented control
+    open var segmentedControlHorizontalInset: CGFloat = 0
+
     var previousPageIndex : Int = 0
     
     /// Automatically handle child view controllers' appearance transitions when switching between tabs
@@ -201,7 +204,7 @@ open class DTPagerController: UIViewController, UIScrollViewDelegate {
         super.viewDidLayoutSubviews()
         
         // Update segmented control frame
-        pageSegmentedControl.frame = CGRect(x: 0, y: 0, width: view.bounds.width, height: segmentedControlHeight)
+        pageSegmentedControl.frame = CGRect(x: self.segmentedControlHorizontalInset, y: 0, width: view.bounds.width - 2 * self.segmentedControlHorizontalInset, height: segmentedControlHeight)
         
         // Scroll view
         setUpPageScrollView()
@@ -374,9 +377,11 @@ open class DTPagerController: UIViewController, UIScrollViewDelegate {
     
     open func setUpScrollIndicator() {
         if viewControllers.count > 0 {
-            scrollIndicator.frame.size = CGSize(width: view.bounds.width/CGFloat(viewControllers.count), height: scrollIndicatorHeight)
+            scrollIndicator.frame.size = CGSize(width: view.bounds.width / CGFloat(viewControllers.count) - self.segmentedControlHorizontalInset,
+                                                height: scrollIndicatorHeight)
         }
         
+        scrollIndicator.frame.origin.x = self.segmentedControlHorizontalInset
         scrollIndicator.frame.origin.y = segmentedControlHeight - scrollIndicatorHeight
         updateScrollIndicatorHorizontalPosition(with: pageScrollView)
     }
@@ -440,7 +445,8 @@ open class DTPagerController: UIViewController, UIScrollViewDelegate {
     open func updateScrollIndicator(with offsetRatio: CGFloat, scrollView: UIScrollView) {
         // let itemWidth = scrollView.frame.width/CGFloat(viewControllers.count)
         if viewControllers.count > 0 {
-            scrollIndicator.center.x = (offsetRatio + 1 / (CGFloat(viewControllers.count) * 2 )) * scrollView.frame.width
+            scrollIndicator.center.x = (offsetRatio + 1 / (CGFloat(viewControllers.count) * 2 )) * (scrollView.frame.width - 2 * self.segmentedControlHorizontalInset)
+            scrollIndicator.center.x += self.segmentedControlHorizontalInset
         }
     }
     
